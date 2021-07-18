@@ -18,7 +18,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-//        $this->app->singleton(GithubUserService::class, function () {
         $this->app->bind(GithubUserService::class, function () {
             $storage = new StorageService(new ApiService(new Client()), new ArrayHelper());
 

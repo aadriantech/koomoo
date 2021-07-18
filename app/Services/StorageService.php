@@ -60,7 +60,7 @@ final class StorageService implements StorageInterface
     public function useCache(string $name, int $expireInSeconds = 3600): self
     {
         $this->cacheName = $name;
-        $this->useCache = true;
+        $this->useCache  = true;
 
         if (!empty($expireInSeconds)) {
             $this->expireInSeconds = $expireInSeconds;
@@ -92,6 +92,7 @@ final class StorageService implements StorageInterface
 
     public function getCacheIfExists(): self
     {
+        $this->isCached = false;
         if ($this->useCache && Cache::store(self::FILE_CACHE)->has($this->cacheName)) {
             $this->isCached = true;
             $this->getCache();
