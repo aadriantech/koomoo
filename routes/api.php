@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Api\GithubController;
+use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,7 +18,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['auth:api'], static function () {
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/login', [LoginController::class, 'login']);
+
+Route::group(['middleware' => 'auth:sanctum'], static function () {
     Route::get('/github/users', [GithubController::class, 'users'])
         ->middleware([
             'request.github-user.params',
