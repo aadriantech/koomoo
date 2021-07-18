@@ -3,30 +3,30 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Cache;
+use App\Interfaces\CacheInterface;
 use Illuminate\Support\Facades\Log;
-use Psr\SimpleCache\InvalidArgumentException;
+use Illuminate\Support\Facades\Redis;
 use Throwable;
 
 trait CacheTrait
 {
     /**
      * @param string|null $dataSource Defines the data source when sending logs
+     * @param CacheInterface $cacheType
      * @param bool $useCache
      * @param string|null $cacheName
      * @param bool $isCached
      * @param int|null $expireInSeconds
      * @param string|null $responseData
-     * @param string $cacheType
      */
     public function __construct(
         public ?string $dataSource,
+        public CacheInterface $cacheType,
         public bool $useCache = false,
         public ?string $cacheName = null,
         public bool $isCached = false,
         public ?int $expireInSeconds = null,
-        public ?string $responseData = null,
-        public string $cacheType = 'file'
+        public ?string $responseData = null
     )
     {
     }
@@ -46,10 +46,9 @@ trait CacheTrait
     private function getCache(): void
     {
         try {
-            $dataFromCache = Cache::store($this->cacheType)
-                ->get($this->cacheName);
+            $dataFromCache = $this->cacheType->get($this->cacheName);
 
-        } catch (InvalidArgumentException $e) {
+        } catch (Throwable $e) {
             $errorMessage = sprintf(
                 'Class: StorageService; Method: getCache; Message: %s',
                 $e->getMessage()
@@ -67,7 +66,7 @@ trait CacheTrait
     public function getCacheIfExists(): self
     {
         $this->isCached = false;
-        if ($this->useCache && Cache::store($this->cacheType)->has($this->cacheName)) {
+        if ($this->useCache && $this->cacheType->exists($this->cacheName)) {
             $this->isCached = true;
             $this->getCache();
         }
@@ -78,7 +77,7 @@ trait CacheTrait
     private function saveToCache(): void
     {
         try {
-            if (!Cache::store($this->cacheType)->has($this->cacheName)) {
+            if (!$this->cacheType->exists($this->cacheName)) {
                 // set expiration value
                 $duration = now()->addMonth();
                 if (null !== $this->expireInSeconds) {
@@ -98,10 +97,10 @@ trait CacheTrait
                 }
 
                 // store data to cache
-                Cache::put($this->cacheName, $this->responseData, $duration);
+                $this->cacheType->set($this->cacheName, $this->responseData, $duration->second);
             }
 
-        } catch (InvalidArgumentException | Throwable $e) {
+        } catch (Throwable $e) {
             $errorMessage = sprintf('Class: StorageService; Method: cached; Message: %s', $e->getMessage());
             Log::error($errorMessage);
         }
@@ -127,8 +126,8 @@ trait CacheTrait
         return $this;
     }
 
-    public function setCacheType(string $type)
+    public function setCacheType(CacheInterface $cacheType): void
     {
-        $this->cacheType = $type;
+        $this->cacheType = $cacheType;
     }
 }

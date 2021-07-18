@@ -50,6 +50,19 @@ services:
           test: ["CMD", "redis-cli", "ping"]
           retries: 3
           timeout: 5s
+    redis-commander:
+        container_name: redis-commander
+        hostname: redis-commander
+        image: rediscommander/redis-commander:latest
+        restart: always
+        environment:
+            - REDIS_HOSTS=redis
+        ports:
+            - "8081:8081"
+        networks:
+            - sail
+        depends_on:
+            - redis
 networks:
     sail:
         driver: bridge

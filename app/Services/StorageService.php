@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Helpers\ArrayHelper;
+use App\Interfaces\CacheInterface;
 use App\Interfaces\DataInterface;
 use App\Interfaces\StorageInterface;
 use App\Traits\CacheTrait;
@@ -15,6 +16,7 @@ final class StorageService implements StorageInterface
     /**
      * @param DataInterface $data Dependency Injection (Mysql, Mongo, Postgress etc)
      * @param ArrayHelper $arrayHelper
+     * @param CacheInterface $cacheType
      * @param string|null $url
      * @param string|null $action
      * @param array|null $errorMessages
@@ -22,12 +24,13 @@ final class StorageService implements StorageInterface
     public function __construct(
         protected DataInterface $data,
         protected ArrayHelper $arrayHelper,
+        public CacheInterface $cacheType,
         public ?string $url = null,
         public ?string $action = null,
         protected ?array $errorMessages = null
     )
     {
-        $this->setCacheType('file');
+        $this->setCacheType($this->cacheType);
     }
 
     public function setUrl(string $url): self
