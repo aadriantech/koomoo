@@ -105,7 +105,8 @@ final class GithubUserService
                     $response = $this->storage
                         ->setUrl("https://api.github.com/users")
                         ->setAction($username)
-                        ->useCache($username,self::CACHE_EXPIRY)
+                        ->setDataSource("https://api.github.com/users/$username")
+                        ->cache($username,self::CACHE_EXPIRY)
                         ->sendRequest()
                         ->toArray();
 
