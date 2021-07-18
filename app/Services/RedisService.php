@@ -6,7 +6,7 @@ namespace App\Services;
 use App\Interfaces\CacheInterface;
 use Illuminate\Support\Facades\Redis;
 
-class RedisService implements CacheInterface
+final class RedisService implements CacheInterface
 {
     public function __construct(public Redis $redis)
     {

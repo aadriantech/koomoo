@@ -167,4 +167,8 @@ an array of usernames
 }
 ```
 
+## Tools
+Redis Commander Gui Tool
+- http://localhost/:8081
+
 
