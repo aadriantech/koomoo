@@ -167,6 +167,9 @@ an array of usernames
 }
 ```
 
+- GET - http://localhost/api/distance/hamming?x=1&y=4 (hamming distance)
+Computes for the hamming distance, pass in x and y values
+
 ## Tools
 Redis Commander Gui Tool
 - http://localhost/:8081
